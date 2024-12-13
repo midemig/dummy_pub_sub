@@ -21,9 +21,15 @@ def generate_launch_description():
     ]
 
     delay_sub_params = [
-        # [topic_name, message_type, period]
+        # [topic_name, message_type, delay (s)]
         ['/camera', 'Image', 10.0],
         ['/odom', 'Odometry', 15.0],
+    ]
+
+    delay_pub_params = [
+        # [frequency, topic_name, message_type, delay (s)]
+        [20.0, '/camera', 'Image', 30.0],
+        [10.0, '/odom', 'Odometry', 35.0],
     ]
 
     pub_nodes = []
@@ -61,6 +67,22 @@ def generate_launch_description():
                     name=f'dummy_subscriber_delay_{i}',
                     parameters=[{'topic_name': params[0]},
                                 {'message_type': params[1]}],
+                    output='screen'
+                )
+            ]
+        ))
+
+    for i, params in enumerate(delay_pub_params):
+        delay_sub_nodes.append(TimerAction(
+            period=params[3],
+            actions=[
+                Node(
+                    package='dummy_pub_sub',
+                    executable='dummy_pub_node',
+                    name=f'dummy_subscriber_delay_{i}',
+                    parameters=[{'frequency': params[0]},
+                                {'topic_name': params[1]},
+                                {'message_type': params[2]}],
                     output='screen'
                 )
             ]
